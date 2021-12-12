@@ -18,13 +18,12 @@ public class ConsoleGame {
         }
     }
 
-    private int[] selectCell() {
-        int[] pos = new int[2];
+    private Coords selectCell() {
         System.out.print("Select x-pos : ");
-        pos[0] = scan.nextInt();
+        int x = scan.nextInt();
         System.out.print("Select y-pos : ");
-        pos[1] = scan.nextInt();
-        return pos;
+        int y = scan.nextInt();
+        return new Coords(x,y);
     }
     private void print(boolean[] openedCells) {
         String gameBoard = "";
@@ -32,26 +31,27 @@ public class ConsoleGame {
         int yMargin = Integer.toString(minesMatrix.getBoardHeight()).length()+2;
         gameBoard += minesMatrix.getMineAmount() + " amount of mines \n";
 
-        gameBoard += addSpaces("", yMargin);
+        gameBoard += addSpacesToString("", yMargin);
         for(int x = 0; x < minesMatrix.getBoardWidth(); x++){
-            gameBoard += addSpaces(Integer.toString(x),xMargin);
+            gameBoard += addSpacesToString(Integer.toString(x),xMargin);
         }
         gameBoard += "\n";
 
         for(int y = 0; y < minesMatrix.getBoardHeight(); y++){
-            gameBoard += addSpaces(y + ".",yMargin);
+            gameBoard += addSpacesToString(y + ".",yMargin);
             for(int x = 0; x < minesMatrix.getBoardWidth(); x++){
-                if(openedCells[minesMatrix.coordinatesToIndex(x,y)]){
-                    gameBoard += addSpaces(minesMatrix.getCell(x,y),xMargin);
+                if(openedCells[minesMatrix.coordinatesToIndex(new Coords(x,y))]){
+                    gameBoard += addSpacesToString(minesMatrix.getCell(new Coords(x,y)),xMargin);
                 }else {
-                    gameBoard += addSpaces("□",xMargin);
+                    gameBoard += addSpacesToString("□",xMargin);
                 }
             }
             gameBoard += "\n";
         }
         System.out.println(gameBoard);
     }
-    private String addSpaces(String str, int n){
+
+    private String addSpacesToString(String str, int n){
         String st = "";
         for(int i = str.length(); i<n; i++)
             st += " ";

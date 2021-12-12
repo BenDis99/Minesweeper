@@ -1,5 +1,7 @@
 package com.company.main;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -49,20 +51,31 @@ public class Minesweeper {
         setCellNumberByAmountOfBombNeighbours();
 
     }
+
+    /**
+     * Constructer where you can set board manually
+     * Used for testing
+     * @param gameBoard - manually set gameboard
+     * @param width     - width of board - it figures the height
+     */
     public Minesweeper(String[] gameBoard, int width){
         this.gameBoard = gameBoard;
         this.boardWidth = width;
         this.boardHeight = gameBoard.length/width;
+        visitedCells = new boolean[width*boardHeight];
+        for(int b = 0; b < visitedCells.length; b++){ visitedCells[b] = false;}
     }
-    public int coordinatesToIndex(int x, int y){return x+y*boardWidth;}
+    public int coordinatesToIndex(Coords cell){return cell.getX()+cell.getY()*boardWidth;}
 
-    public boolean onBoard(int x, int y){
+    public boolean onBoard(Coords cell){
+        int x = cell.getX();
+        int y = cell.getY();
         return (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight);
     }
 
-    public String getCell(int x, int y){
-        if(onBoard(x,y)){
-            return gameBoard[coordinatesToIndex(x,y)];
+    public String getCell(Coords cell){
+        if(onBoard(cell)){
+            return gameBoard[coordinatesToIndex(cell)];
         }
         return null;
     }
@@ -81,31 +94,43 @@ public class Minesweeper {
     public void setCellNumberByAmountOfBombNeighbours(){
         for(int x = 0 ; x < boardWidth ; x++){
             for(int y = 0 ; y < boardHeight ; y++){
-                if(getCell(x,y) == "M"){
+                if(getCell(new Coords(x,y)) == "M"){
                     continue;
                 }
-                gameBoard[x+y*boardWidth] = Integer.toString(numberOfMineNeighbours(x,y));
+                gameBoard[x+y*boardWidth] = Integer.toString(numberOfMineNeighbours(new Coords(x,y)));
             }
         }
     }
 
-    private int numberOfMineNeighbours(int x, int y) {
+    private int numberOfMineNeighbours(Coords cell) {
         int count = 0;
-        int[][] neighPos = {{x - 1, y - 1}, {x - 1, y}, {x - 1, y + 1}, {x, y - 1}, {x, y + 1}, {x + 1, y - 1}, {x + 1, y}, {x + 1, y + 1}};
-        for (int[] pos : neighPos) {
-            if (onBoard(pos[0], pos[1]) && getCell(pos[0],pos[1]) == "M") {
+        HashSet<Coords> neighPos = getNeighbouringCells(cell);
+        for (Coords pos : neighPos) {
+            if (getCell(pos) == "M") {
                 count++;
             }
         }
         return count;
     }
+    private HashSet<Coords> getNeighbouringCells(Coords cell){
+        int x = cell.getX();
+        int y = cell.getY();
+        int[][] neighPos = {{x - 1, y - 1}, {x - 1, y}, {x - 1, y + 1}, {x, y - 1}, {x, y + 1}, {x + 1, y - 1}, {x + 1, y}, {x + 1, y + 1}};
+        HashSet<Coords> neighbours = new HashSet();
+        for(int[] coords: neighPos){
+            Coords c = new Coords(coords[0],coords[1]);
+            if(onBoard(c))
+                neighbours.add(c);
+        }
+        return neighbours;
+    }
 
-    public void select(int[] pos) {
-        String selected = getCell(pos[0], pos[1]);
+    public void select(Coords cell) {
+        String selected = getCell(cell);
         if(selected == "M"){
             exploded = true;
         }
-        visitedCells[coordinatesToIndex(pos[0], pos[1])] = true;
+        visitedCells[coordinatesToIndex(cell)] = true;
 
     }
 
