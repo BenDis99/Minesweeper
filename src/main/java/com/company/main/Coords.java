@@ -24,4 +24,13 @@ public class Coords {
         this.x = x;
         this.y = y;
     }
+    @Override
+    public boolean equals(Object o){
+        return (x == ((Coords) o).getX() && y == ((Coords) o).getY());
+    }
+
+    @Override
+    public String toString(){
+        return (x + " : " + y);
+    }
 }

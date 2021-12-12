@@ -131,7 +131,32 @@ public class Minesweeper {
             exploded = true;
         }
         visitedCells[coordinatesToIndex(cell)] = true;
+        openVisitedByEmptyNeighbouringCells(cell);
 
+    }
+
+    /**
+     * Loops through neighbouring "0"-cells and marks them as visited
+     * @param cell
+     */
+    private void openVisitedByEmptyNeighbouringCells(Coords cell){
+        HashSet<Coords> neighbours = getNeighbouringCells(cell);
+        System.out.println(neighbours);
+
+    }
+    private HashSet<Coords> addNeighboursNeighbours(HashSet<Coords> totalNeighbours, Coords cell){
+        HashSet<Coords> newSet = new HashSet<>();
+        for(Coords neigh : getNeighbouringCells(cell)){
+            if(visitedCells[coordinatesToIndex(neigh)]){
+                if(getCell(neigh) == "0"){
+                    newSet.addAll(addNeighboursNeighbours(totalNeighbours, neigh));
+                }
+                else if(getCell(neigh) != "M"){
+                    newSet.add(neigh);
+                }
+            }
+        }
+        return newSet;
     }
 
 
