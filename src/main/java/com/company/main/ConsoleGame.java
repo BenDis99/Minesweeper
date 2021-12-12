@@ -13,10 +13,8 @@ public class ConsoleGame {
 
     public void run() {
         while(!minesMatrix.isExploded()){
-            minesMatrix.select(selectCell());
-
             print(minesMatrix.getVisitedCells());
-
+            minesMatrix.select(selectCell());
         }
     }
 
@@ -30,25 +28,33 @@ public class ConsoleGame {
     }
     private void print(boolean[] openedCells) {
         String gameBoard = "";
+        int xMargin = Integer.toString(minesMatrix.getBoardWidth()).length();
+        int yMargin = Integer.toString(minesMatrix.getBoardHeight()).length()+2;
         gameBoard += minesMatrix.getMineAmount() + " amount of mines \n";
 
-        gameBoard += "   ";
+        gameBoard += addSpaces("", yMargin);
         for(int x = 0; x < minesMatrix.getBoardWidth(); x++){
-            gameBoard += x + " ";
+            gameBoard += addSpaces(Integer.toString(x),xMargin);
         }
         gameBoard += "\n";
 
         for(int y = 0; y < minesMatrix.getBoardHeight(); y++){
-            gameBoard += y + ". ";
+            gameBoard += addSpaces(y + ".",yMargin);
             for(int x = 0; x < minesMatrix.getBoardWidth(); x++){
                 if(openedCells[minesMatrix.coordinatesToIndex(x,y)]){
-                    gameBoard += minesMatrix.getCell(x,y) + " ";
+                    gameBoard += addSpaces(minesMatrix.getCell(x,y),xMargin);
                 }else {
-                    gameBoard += "□ ";
+                    gameBoard += addSpaces("□",xMargin);
                 }
             }
             gameBoard += "\n";
         }
         System.out.println(gameBoard);
+    }
+    private String addSpaces(String str, int n){
+        String st = "";
+        for(int i = str.length(); i<n; i++)
+            st += " ";
+        return str+st;
     }
 }
