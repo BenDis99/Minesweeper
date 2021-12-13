@@ -1,39 +1,44 @@
-package com.company.main;
+package com.company.main.GUI;
+
+import com.company.main.Game.Coords;
+import com.company.main.Game.Minesweeper;
 
 import java.util.Scanner;
 
-public class ConsoleGame {
+public class ConsoleGUI implements MinesweeperGUI{
     Minesweeper minesMatrix;
     Scanner scan;
 
-    public ConsoleGame(int width, int height, int numMines){
+    public ConsoleGUI(int width, int height, int numMines){
         minesMatrix = new Minesweeper(width,height,numMines);
         scan = new Scanner(System.in);
     }
 
     public void run() {
         while(!minesMatrix.isExploded() && !minesMatrix.victory()){
-            print(minesMatrix.getVisitedCells());
-            minesMatrix.select(selectCell());
+            update();
+            selectCell();
         }
         if(minesMatrix.isExploded()){
-            print(minesMatrix.getVisitedCells());
+            update();
             System.out.println("You hit a mine and lost");
         }else if(minesMatrix.victory()){
-            print(minesMatrix.getVisitedCells());
+            update();
             System.out.println("You won, you located all the non-mine cells");
         }
 
     }
 
-    private Coords selectCell() {
+    public void selectCell() {
         System.out.print("Select x-pos : ");
         int x = scan.nextInt();
         System.out.print("Select y-pos : ");
         int y = scan.nextInt();
-        return new Coords(x,y);
+        minesMatrix.select(new Coords(x,y));
     }
-    private void print(boolean[] openedCells) {
+
+    public void update() {
+        boolean[] openedCells = minesMatrix.getVisitedCells();
         String gameBoard = "";
         int xMargin = Integer.toString(minesMatrix.getBoardWidth()).length();
         int yMargin = Integer.toString(minesMatrix.getBoardHeight()).length()+2;

@@ -1,11 +1,8 @@
 package com.company.test;
 
-import com.company.main.Coords;
-import com.company.main.Minesweeper;
+import com.company.main.Game.Coords;
+import com.company.main.Game.Minesweeper;
 import org.junit.*;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +17,7 @@ public class MinesweeperTest {
         game.setCellNumberByAmountOfBombNeighbours();
     }
     @Test
-    public void testIfBomCountIsCorrect(){
+    public void testIfBombCountIsCorrect(){
 
         assertEquals("M",game.getCell(new Coords(0,0))); // Does not count itself
         assertEquals("M",game.getCell(new Coords(1,0))); // Does not count itself
