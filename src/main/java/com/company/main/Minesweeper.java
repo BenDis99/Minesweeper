@@ -14,6 +14,7 @@ import java.util.Random;
 public class Minesweeper {
     String[] gameBoard;
     boolean[] visitedCells;
+    int amountVisited;
 
     int boardWidth;
     int boardHeight;
@@ -36,14 +37,21 @@ public class Minesweeper {
     public boolean isExploded() {
         return exploded;
     }
+
     public boolean[] getVisitedCells() {
         return visitedCells;
+    }
+
+    public void visitCell(Coords cell){
+        visitedCells[coordinatesToIndex(cell)] = true;
+        amountVisited++;
     }
 
     public Minesweeper(int width, int height, int mineAmount){
         this.mineAmount = mineAmount;
         this.boardWidth = width;
         this.boardHeight = height;
+        amountVisited = 0;
         exploded = false;
         gameBoard = new String[width*height];
         visitedCells = new boolean[width*height];
@@ -65,6 +73,7 @@ public class Minesweeper {
         this.gameBoard = gameBoard;
         this.boardWidth = width;
         this.boardHeight = gameBoard.length/width;
+        amountVisited = 0;
         visitedCells = new boolean[width*boardHeight];
         for(int b = 0; b < visitedCells.length; b++){ visitedCells[b] = false;}
     }
@@ -134,12 +143,11 @@ public class Minesweeper {
     public void select(Coords cell) {
         if(visitedCells[coordinatesToIndex(cell)])
             return;
+        visitCell(cell);
         String selected = getCell(cell);
         if(selected.equals("M")){
             exploded = true;
-        }
-        visitedCells[coordinatesToIndex(cell)] = true;
-        if(selected.equals("0"))
+        } else if(selected.equals("0"))
             openVisitedByEmptyNeighbouringCells(cell);
     }
 
@@ -165,7 +173,11 @@ public class Minesweeper {
             }
         }
         for(Coords visited : searched){
-            visitedCells[coordinatesToIndex(visited)] = true;
+            visitCell(visited);
         }
+    }
+
+    public boolean victory() {
+        return amountVisited == boardWidth*boardHeight-mineAmount;
     }
 }

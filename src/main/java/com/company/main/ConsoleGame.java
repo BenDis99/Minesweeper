@@ -12,10 +12,18 @@ public class ConsoleGame {
     }
 
     public void run() {
-        while(!minesMatrix.isExploded()){
+        while(!minesMatrix.isExploded() && !minesMatrix.victory()){
             print(minesMatrix.getVisitedCells());
             minesMatrix.select(selectCell());
         }
+        if(minesMatrix.isExploded()){
+            print(minesMatrix.getVisitedCells());
+            System.out.println("You hit a mine and lost");
+        }else if(minesMatrix.victory()){
+            print(minesMatrix.getVisitedCells());
+            System.out.println("You won, you located all the non-mine cells");
+        }
+
     }
 
     private Coords selectCell() {
