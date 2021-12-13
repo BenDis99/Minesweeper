@@ -4,6 +4,9 @@ import com.company.main.Coords;
 import com.company.main.Minesweeper;
 import org.junit.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 
 public class MinesweeperTest {
@@ -40,7 +43,12 @@ public class MinesweeperTest {
                 count++;
         }
         assertEquals(6, count);
-
-
+        assertEquals(true,game.victory());
+    }
+    @Test
+    public void testIfExplodedWhenChoosingAMineCell(){
+        Coords pos = new Coords(1,0);
+        game.select(pos);
+        assertEquals(true,game.isExploded());
     }
 }

@@ -43,8 +43,10 @@ public class Minesweeper {
     }
 
     public void visitCell(Coords cell){
-        visitedCells[coordinatesToIndex(cell)] = true;
-        amountVisited++;
+        if(!visitedCells[coordinatesToIndex(cell)]){
+            visitedCells[coordinatesToIndex(cell)] = true;
+            amountVisited++;
+        }
     }
 
     public Minesweeper(int width, int height, int mineAmount){
@@ -73,9 +75,15 @@ public class Minesweeper {
         this.gameBoard = gameBoard;
         this.boardWidth = width;
         this.boardHeight = gameBoard.length/width;
+        exploded = false;
         amountVisited = 0;
         visitedCells = new boolean[width*boardHeight];
-        for(int b = 0; b < visitedCells.length; b++){ visitedCells[b] = false;}
+        mineAmount = 0;
+        for(int b = 0; b < gameBoard.length; b++){
+            if(gameBoard[b].equals("M"))
+                mineAmount++;
+            visitedCells[b] = false;
+        }
     }
     public int coordinatesToIndex(Coords cell){return cell.getX()+cell.getY()*boardWidth;}
 
