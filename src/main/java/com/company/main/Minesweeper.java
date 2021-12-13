@@ -2,6 +2,7 @@ package com.company.main;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 
 /**
@@ -46,7 +47,9 @@ public class Minesweeper {
         exploded = false;
         gameBoard = new String[width*height];
         visitedCells = new boolean[width*height];
-        for(int b = 0; b < visitedCells.length; b++){ visitedCells[b] = false;}
+        for(int b = 0; b < gameBoard.length; b++){
+            gameBoard[b] = "";
+            visitedCells[b] = false;}
         setMinesRandomly();
         setCellNumberByAmountOfBombNeighbours();
 
@@ -85,7 +88,7 @@ public class Minesweeper {
         Random rand = new Random();
         while(i>0){
             int minePos = rand.nextInt(boardWidth*boardHeight);
-            if(gameBoard[minePos] != "M" ) {
+            if(!gameBoard[minePos].equals("M")) {
                 gameBoard[minePos] = "M";
                 i--;
             }
@@ -94,7 +97,7 @@ public class Minesweeper {
     public void setCellNumberByAmountOfBombNeighbours(){
         for(int x = 0 ; x < boardWidth ; x++){
             for(int y = 0 ; y < boardHeight ; y++){
-                if(getCell(new Coords(x,y)) == "M"){
+                if(getCell(new Coords(x,y)).equals("M")){
                     continue;
                 }
                 gameBoard[x+y*boardWidth] = Integer.toString(numberOfMineNeighbours(new Coords(x,y)));
@@ -106,7 +109,7 @@ public class Minesweeper {
         int count = 0;
         HashSet<Coords> neighPos = getNeighbouringCells(cell);
         for (Coords pos : neighPos) {
-            if (getCell(pos) == "M") {
+            if (getCell(pos).equals("M")) {
                 count++;
             }
         }
@@ -115,7 +118,10 @@ public class Minesweeper {
     private HashSet<Coords> getNeighbouringCells(Coords cell){
         int x = cell.getX();
         int y = cell.getY();
-        int[][] neighPos = {{x - 1, y - 1}, {x - 1, y}, {x - 1, y + 1}, {x, y - 1}, {x, y + 1}, {x + 1, y - 1}, {x + 1, y}, {x + 1, y + 1}};
+        int[][] neighPos = {{x - 1, y - 1}, {x - 1, y},
+                {x - 1, y + 1}, {x, y - 1},
+                {x, y + 1}, {x + 1, y - 1},
+                {x + 1, y}, {x + 1, y + 1}};
         HashSet<Coords> neighbours = new HashSet();
         for(int[] coords: neighPos){
             Coords c = new Coords(coords[0],coords[1]);
@@ -126,13 +132,15 @@ public class Minesweeper {
     }
 
     public void select(Coords cell) {
+        if(visitedCells[coordinatesToIndex(cell)])
+            return;
         String selected = getCell(cell);
-        if(selected == "M"){
+        if(selected.equals("M")){
             exploded = true;
         }
         visitedCells[coordinatesToIndex(cell)] = true;
-        openVisitedByEmptyNeighbouringCells(cell);
-
+        if(selected.equals("0"))
+            openVisitedByEmptyNeighbouringCells(cell);
     }
 
     /**
@@ -140,24 +148,24 @@ public class Minesweeper {
      * @param cell
      */
     private void openVisitedByEmptyNeighbouringCells(Coords cell){
-        HashSet<Coords> neighbours = getNeighbouringCells(cell);
-        System.out.println(neighbours);
-
-    }
-    private HashSet<Coords> addNeighboursNeighbours(HashSet<Coords> totalNeighbours, Coords cell){
-        HashSet<Coords> newSet = new HashSet<>();
-        for(Coords neigh : getNeighbouringCells(cell)){
-            if(visitedCells[coordinatesToIndex(neigh)]){
-                if(getCell(neigh) == "0"){
-                    newSet.addAll(addNeighboursNeighbours(totalNeighbours, neigh));
-                }
-                else if(getCell(neigh) != "M"){
-                    newSet.add(neigh);
+        LinkedList<Coords> searchNeighbours = new LinkedList<>();
+        ArrayList<Coords> searched = new ArrayList<>();
+        searchNeighbours.add(cell);
+        while(!searchNeighbours.isEmpty()){
+            Coords search = searchNeighbours.pop();
+            searched.add(search);
+            for(Coords coords : getNeighbouringCells(search)){
+                if(!searched.contains(coords)){
+                    if(getCell(coords).equals("0")){
+                        searchNeighbours.add(coords);
+                    } else if (!getCell(coords).equals("M")){
+                        searched.add(coords);
+                    }
                 }
             }
         }
-        return newSet;
+        for(Coords visited : searched){
+            visitedCells[coordinatesToIndex(visited)] = true;
+        }
     }
-
-
 }
