@@ -90,7 +90,7 @@ public class BoardStage extends InputAdapter {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Coords boardCords = translateScreenCoordsToBoardCords(screenX, screenY);
-        if(boardCords != null){
+        if(!gameBoard.gameOver() && boardCords != null){
             gameBoard.select(boardCords);
             updateTileMap();
         }

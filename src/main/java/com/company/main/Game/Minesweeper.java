@@ -210,4 +210,8 @@ public class Minesweeper {
     public boolean victory() {
         return (!exploded && amountVisited == boardWidth*boardHeight-mineAmount);
     }
+
+    public boolean gameOver() {
+        return exploded || victory();
+    }
 }

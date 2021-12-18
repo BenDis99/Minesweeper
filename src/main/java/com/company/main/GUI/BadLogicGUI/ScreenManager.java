@@ -12,7 +12,7 @@ public class ScreenManager extends Game {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        setScreen(new GameScreen(this, 10, 10 ,35));
+        setScreen(new GameScreen(this, 100, 100 ,(int) 10000/3));
     }
 
     @Override
