@@ -16,6 +16,8 @@ public class Minesweeper {
     boolean[] visitedCells;
     int amountVisited;
 
+    Coords lastSelected;
+
     int boardWidth;
     int boardHeight;
     int mineAmount;
@@ -151,15 +153,32 @@ public class Minesweeper {
         return neighbours;
     }
 
+    public Coords getLastSelected() {
+        return lastSelected;
+    }
+
     public void select(Coords cell) {
+        if(!exploded || !victory())
         if(visitedCells[coordinatesToIndex(cell)])
             return;
         visitCell(cell);
+        lastSelected = cell;
         String selected = getCell(cell);
         if(selected.equals("M")){
             exploded = true;
+            setMinesVisible();
         } else if(selected.equals("0"))
             openVisitedByEmptyNeighbouringCells(cell);
+    }
+
+    private void setMinesVisible() {
+        for(int y = 0; y < boardHeight; y++){
+            for(int x = 0; x < boardWidth; x++){
+                Coords xy = new Coords(x,y);
+                if(getCell(xy).equals("M"))
+                    visitCell(xy);
+            }
+        }
     }
 
     /**
@@ -189,6 +208,6 @@ public class Minesweeper {
     }
 
     public boolean victory() {
-        return amountVisited == boardWidth*boardHeight-mineAmount;
+        return (!exploded && amountVisited == boardWidth*boardHeight-mineAmount);
     }
 }

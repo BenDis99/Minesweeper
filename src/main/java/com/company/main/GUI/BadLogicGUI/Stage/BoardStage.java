@@ -40,7 +40,7 @@ public class BoardStage extends InputAdapter {
         // Set up cellTextures
         TextureRegion[][] cellTextureRegions = TextureRegion.split(new Texture("gameObjects/gameObjectsMap2.png"), 32, 32);
         cellTextures = new HashMap<>();
-        cellTextures.put("0",new TextureRegion(cellTextureRegions[2][1]));
+        cellTextures.put("0",new TextureRegion(cellTextureRegions[3][3]));
         cellTextures.put("1",new TextureRegion(cellTextureRegions[0][0]));
         cellTextures.put("2",new TextureRegion(cellTextureRegions[0][1]));
         cellTextures.put("3",new TextureRegion(cellTextureRegions[0][2]));
@@ -53,6 +53,7 @@ public class BoardStage extends InputAdapter {
         cellTextures.put("O",new TextureRegion(cellTextureRegions[2][1])); // Open cell
         cellTextures.put("M",new TextureRegion(cellTextureRegions[2][2])); // Mine
         cellTextures.put("F",new TextureRegion(cellTextureRegions[2][3])); // Flag
+        cellTextures.put("R",new TextureRegion(cellTextureRegions[3][0])); // RedBackground
         cellTextures.put("E",new TextureRegion(cellTextureRegions[3][3])); // Empty (transparent
 
         // setting up cells by gameMatrix
@@ -105,6 +106,10 @@ public class BoardStage extends InputAdapter {
                 else
                     topLayer.getCell(x,y).getTile().setTextureRegion(cellTextures.get("L"));
             }
+        }
+        if(gameBoard.isExploded()){
+            Coords last = gameBoard.getLastSelected();
+            boardLayer.getCell(last.getX(), last.getY()).getTile().setTextureRegion(cellTextures.get("R"));
         }
     }
 
