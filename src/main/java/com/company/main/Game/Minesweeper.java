@@ -48,6 +48,9 @@ public class Minesweeper {
             amountVisited++;
         }
     }
+    public boolean isCellVisited(Coords cell){
+        return visitedCells[coordinatesToIndex(cell)];
+    }
 
     public Minesweeper(int width, int height, int mineAmount){
         this.mineAmount = mineAmount;

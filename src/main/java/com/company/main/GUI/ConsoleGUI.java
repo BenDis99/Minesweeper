@@ -9,6 +9,12 @@ public class ConsoleGUI implements MinesweeperGUI{
     Minesweeper minesMatrix;
     Scanner scan;
 
+    public static void main(String[] args) {
+        ConsoleGUI game = new ConsoleGUI(3,3,2);
+        game.run();
+
+    }
+
     public ConsoleGUI(int width, int height, int numMines){
         minesMatrix = new Minesweeper(width,height,numMines);
         scan = new Scanner(System.in);
