@@ -30,6 +30,7 @@ public class BoardStage extends InputAdapter {
     Minesweeper gameBoard;
 
     TiledMap boardMap;
+    TiledMapTileLayer flagLayer; // Contains the flags
     TiledMapTileLayer topLayer;   // Contains the covers over unknown cells
     TiledMapTileLayer itemLayer;  // Contains numbers and mines
     TiledMapTileLayer boardLayer; // Contains the background of cells
@@ -57,15 +58,18 @@ public class BoardStage extends InputAdapter {
         cellTextures.put("E",new TextureRegion(cellTextureRegions[3][3])); // Empty (transparent
 
         // setting up cells by gameMatrix
+        flagLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
         topLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
         itemLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
         boardLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
 
         for(int y = 0; y < gameBoard.getBoardHeight(); y++) {
             for(int x = 0; x < gameBoard.getBoardWidth(); x++) {
+                flagLayer.setCell(x,y,new TiledMapTileLayer.Cell());
                 topLayer.setCell(x,y,new TiledMapTileLayer.Cell());
                 itemLayer.setCell(x,y,new TiledMapTileLayer.Cell());
                 boardLayer.setCell(x,y,new TiledMapTileLayer.Cell());
+                flagLayer.getCell(x,y).setTile(new StaticTiledMapTile(cellTextures.get("E")));
                 topLayer.getCell(x,y).setTile(new StaticTiledMapTile(cellTextures.get("L")));
                 boardLayer.getCell(x,y).setTile(new StaticTiledMapTile(cellTextures.get("O")));
                 TextureRegion item = cellTextures.get(gameBoard.getCell(new Coords(x,y)));
@@ -77,6 +81,7 @@ public class BoardStage extends InputAdapter {
         boardMap.getLayers().add(boardLayer);
         boardMap.getLayers().add(itemLayer);
         boardMap.getLayers().add(topLayer);
+        boardMap.getLayers().add(flagLayer);
 
         boardCam = new OrthographicCamera();
         boardCam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -90,10 +95,25 @@ public class BoardStage extends InputAdapter {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Coords boardCords = translateScreenCoordsToBoardCords(screenX, screenY);
-        if(!gameBoard.gameOver() && boardCords != null){
-            gameBoard.select(boardCords);
-            updateTileMap();
+        switch (button){
+            case 0 :
+                if(!gameBoard.gameOver() && boardCords != null && !flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().getTextureRegion().equals(cellTextures.get("F"))){
+                    gameBoard.select(boardCords);
+                    updateTileMap();
+                }
+                break;
+            case 1 :
+                if(!gameBoard.gameOver() && boardCords != null){
+                    TextureRegion texture = flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().getTextureRegion();
+                    if(texture.equals(cellTextures.get("F"))){
+                        flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().setTextureRegion(cellTextures.get("E"));
+                    } else {
+                        flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().setTextureRegion(cellTextures.get("F"));
+                    }
+                }
+                break;
         }
+
 
         return super.touchDown(screenX, screenY, pointer, button);
     }
