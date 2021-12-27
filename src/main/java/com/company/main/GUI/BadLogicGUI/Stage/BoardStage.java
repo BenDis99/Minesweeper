@@ -105,10 +105,12 @@ public class BoardStage extends InputAdapter {
             case 1 :
                 if(!gameBoard.gameOver() && boardCords != null){
                     TextureRegion texture = flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().getTextureRegion();
-                    if(texture.equals(cellTextures.get("F"))){
-                        flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().setTextureRegion(cellTextures.get("E"));
-                    } else {
-                        flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().setTextureRegion(cellTextures.get("F"));
+                    if(!gameBoard.isCellVisited(boardCords)){
+                        if(texture.equals(cellTextures.get("F"))){
+                            flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().setTextureRegion(cellTextures.get("E"));
+                        } else {
+                            flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().setTextureRegion(cellTextures.get("F"));
+                        }
                     }
                 }
                 break;
@@ -141,7 +143,7 @@ public class BoardStage extends InputAdapter {
     }
 
     public void moveBoard(int screenX, int screenY) {
-        if(Gdx.input.isButtonPressed(1)) { //Right mouse button.
+        if(Gdx.input.isButtonPressed(2)) { //Mouse wheel button
             float width = Gdx.graphics.getWidth();
             float height = Gdx.graphics.getHeight();
 
