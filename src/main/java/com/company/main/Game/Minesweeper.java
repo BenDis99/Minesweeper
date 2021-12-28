@@ -115,7 +115,7 @@ public class Minesweeper implements IMinesweeper {
 
     private int numberOfMineNeighbours(Coords cell) {
         int count = 0;
-        HashSet<Coords> neighPos = getNeighbouringCells(cell);
+        Set<Coords> neighPos = getNeighbouringCells(cell);
         for (Coords pos : neighPos) {
             if (getCell(pos).equals("M")) {
                 count++;
@@ -123,25 +123,44 @@ public class Minesweeper implements IMinesweeper {
         }
         return count;
     }
-    private HashSet<Coords> getNeighbouringCells(Coords cell){
+    private Set<Coords> getNeighbouringCells(Coords cell){
         int x = cell.getX();
         int y = cell.getY();
-        int[][] neighPos = {{x - 1, y - 1}, {x - 1, y},
-                {x - 1, y + 1}, {x, y - 1},
-                {x, y + 1}, {x + 1, y - 1},
-                {x + 1, y}, {x + 1, y + 1}};
-        HashSet<Coords> neighbours = new HashSet();
-        for(int[] coords: neighPos){
-            Coords c = new Coords(coords[0],coords[1]);
-            if(onBoard(c))
-                neighbours.add(c);
+        Set<Coords> neighbours = new HashSet();
+        for(int i=-1; i<=1; i++){
+            for(int d=-1; d<=1; d++){
+                Coords coords = new Coords(x+i,y+d);
+                if(onBoard(coords) && !(i==0 && d==0)){
+                    neighbours.add(coords);
+                }
+            }
+        }
+        return neighbours;
+    }
+    private Set<Coords> getOrthogonalCells(Coords cell){
+        int x = cell.getX();
+        int y = cell.getY();
+        Set<Coords> neighbours = new HashSet();
+        Coords coords = new Coords(x-1,y);
+        if(onBoard(coords)){
+            neighbours.add(coords);
+        }
+        coords = new Coords(x+1,y);
+        if(onBoard(coords)){
+            neighbours.add(coords);
+        }
+        coords = new Coords(x,y-1);
+        if(onBoard(coords)){
+            neighbours.add(coords);
+        }
+        coords = new Coords(x,y+1);
+        if(onBoard(coords)){
+            neighbours.add(coords);
         }
         return neighbours;
     }
 
-    public Coords getLastSelected() {
-        return lastSelected;
-    }
+
 
     private Set<Coords> setMinesVisible() {
         Set<Coords> mines = new HashSet<>();
@@ -161,7 +180,7 @@ public class Minesweeper implements IMinesweeper {
      * Loops through neighbouring "0"-cells and marks them as visited
      * @param cell
      */
-    private Set<Coords> openVisitedByEmptyNeighbouringCells(Coords cell){
+    private Set<Coords> openVisitedByEmptyNeighbouringCells2(Coords cell){
         LinkedList<Coords> searchNeighbours = new LinkedList<>();
         Set<Coords> searched = new HashSet<>();
         searchNeighbours.add(cell);
@@ -180,6 +199,33 @@ public class Minesweeper implements IMinesweeper {
         }
         for(Coords visited : searched){
             visitCell(visited);
+        }
+        return searched;
+    }
+
+    private Set<Coords> openVisitedByEmptyNeighbouringCells(Coords cell){
+        LinkedList<Coords> searchNeighbours = new LinkedList<>();
+        Set<Coords> searched = new HashSet<>();
+        searchNeighbours.add(cell);
+        searched.addAll(DFS(searched,searchNeighbours));
+
+        for(Coords visited : searched){
+            visitCell(visited);
+        }
+        return searched;
+    }
+    private Set<Coords> DFS(Set<Coords> searched, LinkedList<Coords> toSearch){
+        Coords c = toSearch.pop();
+        searched.add(c);
+        for(Coords coords : getNeighbouringCells(c)){
+            if(!searched.contains(coords)){
+                if(getCell(coords).equals("0")){
+                    toSearch.add(coords);
+                    DFS(searched,toSearch);
+                } else if (!getCell(coords).equals("M")){
+                    searched.add(coords);
+                }
+            }
         }
         return searched;
     }
@@ -203,6 +249,7 @@ public class Minesweeper implements IMinesweeper {
         return visited;
     }
 
+    @Override
     public boolean victory() {
         return (!exploded && amountVisited == boardWidth*boardHeight-mineAmount);
     }
@@ -225,5 +272,10 @@ public class Minesweeper implements IMinesweeper {
     @Override
     public boolean isCellVisited(Coords cell){
         return visitedCells[coordinatesToIndex(cell)];
+    }
+
+    @Override
+    public Coords getLastSelected() {
+        return lastSelected;
     }
 }

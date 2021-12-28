@@ -49,5 +49,5 @@ public interface IMinesweeper {
     /**
      * @return the last cell the user selected
      */
-    Coords getLastSelected();
+    public Coords getLastSelected();
 }
