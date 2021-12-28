@@ -40,25 +40,25 @@ public class ConsoleGUI implements MinesweeperGUI{
         int x = scan.nextInt();
         System.out.print("Select y-pos : ");
         int y = scan.nextInt();
-        minesMatrix.select(new Coords(x,y));
+        minesMatrix.selectCell(new Coords(x,y));
     }
 
     public void update() {
         boolean[] openedCells = minesMatrix.getVisitedCells();
         String gameBoard = "";
-        int xMargin = Integer.toString(minesMatrix.getBoardWidth()).length();
-        int yMargin = Integer.toString(minesMatrix.getBoardHeight()).length()+2;
+        int xMargin = Integer.toString(minesMatrix.getWidth()).length();
+        int yMargin = Integer.toString(minesMatrix.getHeight()).length()+2;
         gameBoard += minesMatrix.getMineAmount() + " amount of mines \n";
 
         gameBoard += addSpacesToString("", yMargin);
-        for(int x = 0; x < minesMatrix.getBoardWidth(); x++){
+        for(int x = 0; x < minesMatrix.getWidth(); x++){
             gameBoard += addSpacesToString(Integer.toString(x),xMargin);
         }
         gameBoard += "\n";
 
-        for(int y = 0; y < minesMatrix.getBoardHeight(); y++){
+        for(int y = 0; y < minesMatrix.getHeight(); y++){
             gameBoard += addSpacesToString(y + ".",yMargin);
-            for(int x = 0; x < minesMatrix.getBoardWidth(); x++){
+            for(int x = 0; x < minesMatrix.getWidth(); x++){
                 if(openedCells[minesMatrix.coordinatesToIndex(new Coords(x,y))]){
                     gameBoard += addSpacesToString(minesMatrix.getCell(new Coords(x,y)),xMargin);
                 }else {

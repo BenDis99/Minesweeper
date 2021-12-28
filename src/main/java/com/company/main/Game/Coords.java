@@ -2,6 +2,7 @@ package com.company.main.Game;
 
 public class Coords {
     int x;
+    int y;
 
     public int getX() {
         return x;
@@ -19,7 +20,6 @@ public class Coords {
         this.y = y;
     }
 
-    int y;
     public Coords(int x, int y){
         this.x = x;
         this.y = y;
@@ -32,5 +32,10 @@ public class Coords {
     @Override
     public String toString(){
         return (x + " : " + y);
+    }
+
+    @Override
+    public int hashCode(){
+        return x+y*1000;
     }
 }

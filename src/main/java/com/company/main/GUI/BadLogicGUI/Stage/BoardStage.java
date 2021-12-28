@@ -9,17 +9,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.company.main.Game.Coords;
-import com.company.main.Game.Minesweeper;
+import com.company.main.Game.IMinesweeper;
 
-import java.awt.*;
-import java.util.EventListener;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.Set;
 
 public class BoardStage extends InputAdapter {
     public OrthographicCamera boardCam;
@@ -27,7 +21,7 @@ public class BoardStage extends InputAdapter {
 
     HashMap<String,TextureRegion> cellTextures;
 
-    Minesweeper gameBoard;
+    IMinesweeper gameBoard;
 
     TiledMap boardMap;
     TiledMapTileLayer flagLayer; // Contains the flags
@@ -35,7 +29,7 @@ public class BoardStage extends InputAdapter {
     TiledMapTileLayer itemLayer;  // Contains numbers and mines
     TiledMapTileLayer boardLayer; // Contains the background of cells
 
-    public BoardStage(Minesweeper gameBoard){
+    public BoardStage(IMinesweeper gameBoard){
         this.gameBoard = gameBoard;
 
         // Set up cellTextures
@@ -58,13 +52,13 @@ public class BoardStage extends InputAdapter {
         cellTextures.put("E",new TextureRegion(cellTextureRegions[3][3])); // Empty (transparent
 
         // setting up cells by gameMatrix
-        flagLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
-        topLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
-        itemLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
-        boardLayer = new TiledMapTileLayer(gameBoard.getBoardWidth(), gameBoard.getBoardHeight(), 32,32);
+        flagLayer = new TiledMapTileLayer(gameBoard.getWidth(), gameBoard.getHeight(), 32,32);
+        topLayer = new TiledMapTileLayer(gameBoard.getWidth(), gameBoard.getHeight(), 32,32);
+        itemLayer = new TiledMapTileLayer(gameBoard.getWidth(), gameBoard.getHeight(), 32,32);
+        boardLayer = new TiledMapTileLayer(gameBoard.getWidth(), gameBoard.getHeight(), 32,32);
 
-        for(int y = 0; y < gameBoard.getBoardHeight(); y++) {
-            for(int x = 0; x < gameBoard.getBoardWidth(); x++) {
+        for(int y = 0; y < gameBoard.getHeight(); y++) {
+            for(int x = 0; x < gameBoard.getWidth(); x++) {
                 flagLayer.setCell(x,y,new TiledMapTileLayer.Cell());
                 topLayer.setCell(x,y,new TiledMapTileLayer.Cell());
                 itemLayer.setCell(x,y,new TiledMapTileLayer.Cell());
@@ -97,13 +91,13 @@ public class BoardStage extends InputAdapter {
         Coords boardCords = translateScreenCoordsToBoardCords(screenX, screenY);
         switch (button){
             case 0 :
-                if(!gameBoard.gameOver() && boardCords != null && !flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().getTextureRegion().equals(cellTextures.get("F"))){
-                    gameBoard.select(boardCords);
-                    updateTileMap();
+                if(!gameBoard.lost() && boardCords != null && !flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().getTextureRegion().equals(cellTextures.get("F"))){
+                    Set<Coords> openedCells = gameBoard.selectCell(boardCords);
+                    updateTileMap(openedCells);
                 }
                 break;
             case 1 :
-                if(!gameBoard.gameOver() && boardCords != null){
+                if(!gameBoard.lost() && boardCords != null){
                     TextureRegion texture = flagLayer.getCell(boardCords.getX(),boardCords.getY()).getTile().getTextureRegion();
                     if(!gameBoard.isCellVisited(boardCords)){
                         if(texture.equals(cellTextures.get("F"))){
@@ -120,16 +114,13 @@ public class BoardStage extends InputAdapter {
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
-    private void updateTileMap() {
-        for(int y = 0; y < gameBoard.getBoardHeight(); y++){
-            for(int x = 0; x < gameBoard.getBoardWidth(); x++){
-                if(gameBoard.isCellVisited(new Coords(x,y)))
-                    topLayer.getCell(x,y).getTile().setTextureRegion(cellTextures.get("E"));
-                else
-                    topLayer.getCell(x,y).getTile().setTextureRegion(cellTextures.get("L"));
-            }
+    private void updateTileMap(Set<Coords> openedCells) {
+        for(Coords cell : openedCells){
+            int x = cell.getX() , y = cell.getY();
+            topLayer.getCell(x,y).getTile().setTextureRegion(cellTextures.get("E"));
+            flagLayer.getCell(x,y).getTile().setTextureRegion(cellTextures.get("E"));
         }
-        if(gameBoard.isExploded()){
+        if(gameBoard.lost() && !gameBoard.victory()){
             Coords last = gameBoard.getLastSelected();
             boardLayer.getCell(last.getX(), last.getY()).getTile().setTextureRegion(cellTextures.get("R"));
         }
@@ -184,7 +175,7 @@ public class BoardStage extends InputAdapter {
     private Coords translateScreenCoordsToBoardCords(int x, int y){
         int boardX = (int) ((boardCam.viewportWidth*boardCam.zoom*(x-Gdx.graphics.getWidth()/2)/Gdx.graphics.getWidth())+boardCam.position.x);
         int boardY = (int) ((boardCam.viewportHeight*boardCam.zoom*(-y+Gdx.graphics.getHeight()/2)/Gdx.graphics.getHeight())+boardCam.position.y);
-        if(0 <= boardX && boardX < gameBoard.getBoardWidth() &&  0 <= boardY && boardY < gameBoard.getBoardHeight())
+        if(0 <= boardX && boardX < gameBoard.getWidth() &&  0 <= boardY && boardY < gameBoard.getHeight())
             return new Coords(boardX,boardY);
         return null;
     }

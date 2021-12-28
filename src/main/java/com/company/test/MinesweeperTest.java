@@ -33,7 +33,7 @@ public class MinesweeperTest {
     @Test
     public void testIfVisitedCellsOpenNeighbouringCellsWithNoNeighbouringMines(){
         Coords pos = new Coords(0,2);
-        game.select(pos);
+        game.selectCell(pos);
         int count = 0;
         for(boolean visited : game.getVisitedCells()){
             if(visited)
@@ -45,7 +45,7 @@ public class MinesweeperTest {
     @Test
     public void testIfExplodedWhenChoosingAMineCell(){
         Coords pos = new Coords(1,0);
-        game.select(pos);
+        game.selectCell(pos);
         assertEquals(true,game.isExploded());
     }
 }

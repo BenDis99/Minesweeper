@@ -1,9 +1,6 @@
 package com.company.main.Game;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 
 /**
  * MinesweeperBoard
@@ -11,7 +8,7 @@ import java.util.Random;
  * M is a mine and any numbered cell has that amount of
  * mines in neighbouring cells.
  */
-public class Minesweeper {
+public class Minesweeper implements IMinesweeper {
     String[] gameBoard;
     boolean[] visitedCells;
     int amountVisited;
@@ -23,14 +20,6 @@ public class Minesweeper {
     int mineAmount;
 
     boolean exploded;
-
-    public int getBoardWidth() {
-        return boardWidth;
-    }
-
-    public int getBoardHeight() {
-        return boardHeight;
-    }
 
     public int getMineAmount() {
         return mineAmount;
@@ -49,9 +38,6 @@ public class Minesweeper {
             visitedCells[coordinatesToIndex(cell)] = true;
             amountVisited++;
         }
-    }
-    public boolean isCellVisited(Coords cell){
-        return visitedCells[coordinatesToIndex(cell)];
     }
 
     public Minesweeper(int width, int height, int mineAmount){
@@ -157,37 +143,27 @@ public class Minesweeper {
         return lastSelected;
     }
 
-    public void select(Coords cell) {
-        if(!exploded || !victory())
-        if(visitedCells[coordinatesToIndex(cell)])
-            return;
-        visitCell(cell);
-        lastSelected = cell;
-        String selected = getCell(cell);
-        if(selected.equals("M")){
-            exploded = true;
-            setMinesVisible();
-        } else if(selected.equals("0"))
-            openVisitedByEmptyNeighbouringCells(cell);
-    }
-
-    private void setMinesVisible() {
+    private Set<Coords> setMinesVisible() {
+        Set<Coords> mines = new HashSet<>();
         for(int y = 0; y < boardHeight; y++){
             for(int x = 0; x < boardWidth; x++){
                 Coords xy = new Coords(x,y);
-                if(getCell(xy).equals("M"))
+                if(getCell(xy).equals("M")) {
                     visitCell(xy);
+                    mines.add(xy);
+                }
             }
         }
+        return mines;
     }
 
     /**
      * Loops through neighbouring "0"-cells and marks them as visited
      * @param cell
      */
-    private void openVisitedByEmptyNeighbouringCells(Coords cell){
+    private Set<Coords> openVisitedByEmptyNeighbouringCells(Coords cell){
         LinkedList<Coords> searchNeighbours = new LinkedList<>();
-        ArrayList<Coords> searched = new ArrayList<>();
+        Set<Coords> searched = new HashSet<>();
         searchNeighbours.add(cell);
         while(!searchNeighbours.isEmpty()){
             Coords search = searchNeighbours.pop();
@@ -205,13 +181,49 @@ public class Minesweeper {
         for(Coords visited : searched){
             visitCell(visited);
         }
+        return searched;
+    }
+
+    @Override
+    public Set<Coords> selectCell(Coords cell) {
+        Set<Coords> visited = new HashSet<>();
+        if(!exploded || !victory())
+            if(visitedCells[coordinatesToIndex(cell)])
+                return visited;
+        visitCell(cell);
+        lastSelected = cell;
+        String selected = getCell(cell);
+        if(selected.equals("M")){
+            exploded = true;
+            return setMinesVisible();
+        }else if(selected.equals("0")) {
+            return openVisitedByEmptyNeighbouringCells(cell);
+        }
+        visited.add(cell);
+        return visited;
     }
 
     public boolean victory() {
         return (!exploded && amountVisited == boardWidth*boardHeight-mineAmount);
     }
 
-    public boolean gameOver() {
+    @Override
+    public boolean lost() {
         return exploded || victory();
+    }
+
+    @Override
+    public int getWidth() {
+        return boardWidth;
+    }
+
+    @Override
+    public int getHeight() {
+        return boardHeight;
+    }
+
+    @Override
+    public boolean isCellVisited(Coords cell){
+        return visitedCells[coordinatesToIndex(cell)];
     }
 }

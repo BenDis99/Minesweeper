@@ -3,15 +3,15 @@ package com.company.main.GUI.BadLogicGUI.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.company.main.GUI.BadLogicGUI.ScreenManager;
 import com.company.main.GUI.BadLogicGUI.Stage.BoardStage;
 import com.company.main.GUI.MinesweeperGUI;
 import com.company.main.Game.Minesweeper;
+import com.company.main.Game.IMinesweeper;
 
 public class GameScreen implements Screen, MinesweeperGUI {
     ScreenManager screenManager;
-    Minesweeper minesMatrix;
+    IMinesweeper minesMatrix;
     BoardStage boardStage;
 
     public GameScreen(ScreenManager screenManager, int width, int height, int numMines) {
